@@ -48,7 +48,7 @@ console.log(req.query);
         res.json({status: 'success', stats: dbResponse.rows})
       }
     })
-    })
+  })
 
   app.get('/api/stats/incomplete', function (req,res) {
     client.query('SELECT * FROM stats WHERE complete = false', function (err, dbResponse) {
