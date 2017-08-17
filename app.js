@@ -62,7 +62,7 @@ console.log(req.query);
   })
   app.get('/api/stats/:id', function (req,res) {
     const id = req.params.id;
-    client.query('SELECT * FROM stats WHERE id=$1 LIMIT 1', [id], function (err, dbResponse) {
+    client.query('SELECT * FROM stats WHERE due_date = 2017', [id], function (err, dbResponse) {
     if (err) {
       console.log(err);
       res.json({ status: 'fail', message:err})
@@ -85,6 +85,28 @@ console.log(req.query);
   app.delete('/api/stats/:eatdelete', function (req, res) {
     const id = req.params.id;
     client.query('DELETE FROM stats WHERE eat = pizza', [id], function (err, dbResponse) {
+    if (err) {
+      console.log(err);
+      res.json({ status: 'fail', message:err})
+    }else{
+      res.json({status: 'success', stats: dbResponse.rows})
+    }
+    })
+  })
+  app.post('/api/stats/:eatdelete', function (req, res) {
+    const id = req.params.id;
+    client.query('INSERT INTO stats ( eat, complete, due_date) VALUES (tacobell,false,12/18/17)', [id], function (err, dbResponse) {
+    if (err) {
+      console.log(err);
+      res.json({ status: 'fail', message:err})
+    }else{
+      res.json({status: 'success', stats: dbResponse.rows})
+    }
+    })
+  })
+  app.post('/api/stats/:eatdelete', function (req, res) {
+    const id = req.params.id;
+    client.query("INSERT INTO stats ( eat, complete, due_date) VALUES (pizza,true,12/13/17)", [id], function (err, dbResponse) {
     if (err) {
       console.log(err);
       res.json({ status: 'fail', message:err})
