@@ -128,17 +128,6 @@ console.log(req.query);
     }
     })
   })
-  // app.post('/api/stats/:eatdelete', function (req, res) {
-  //   const id = req.params.id;
-  //   client.query("INSERT INTO stats ( eat, complete, due_date) VALUES (pizza,true,12/13/17)", [id], function (err, dbResponse) {
-  //   if (err) {
-  //     console.log(err);
-  //     res.json({ status: 'fail', message:err})
-  //   }else{
-  //     res.json({status: 'success', stats: dbResponse.rows})
-  //   }
-  //   })
-  // })
 app.listen(3000, function () {
   console.log("stattracker started")
 });
