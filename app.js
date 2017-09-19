@@ -3,6 +3,8 @@ const {Client} = require('pg');
 const bodyParser = require('body-parser');
 const mustacheExpress = require('mustache-express');
 const app = express();
+const passport = require('passport');
+const {BasicStrategy} = require('passport-http');
 app.use(bodyParser.json());
 
 const client = new Client({
@@ -14,6 +16,27 @@ const client = new Client({
 });
 
 client.connect();
+
+// don't do this to hold your users!
+const users = {
+  'brian': 'terces',
+  'ben': 'srawrats',
+  'adam': 'snuPnagev'
+}
+// say adam try to log in with 'adam' and 'veganPuns'
+// then username is 'adam', password is 'veganPuns'
+passport.use(new BasicStrategy(
+  function(username, password, done) {
+    // done is a function which takes 2 arguments; the first is an error, if there is one, representing eg the database is on fire.
+    // the second argument to done will be 'false', if the login just failed,
+    // or the information about the user, if the login worked.
+      const userPassword = users[username];
+      // for my login, userPassword is undefined
+      if (!userPassword) { return done(null, false); }
+      if (userPassword !== password.split('').reverse().join('')) { return done(null, false); }
+      return done(null, username);
+  }
+));
 
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache')
@@ -60,9 +83,10 @@ console.log(req.query);
       }
     })
   })
+
   app.get('/api/stats/:id', function (req,res) {
     const id = req.params.id;
-    client.query('SELECT * FROM stats WHERE due_date = 2017', [id], function (err, dbResponse) {
+    client.query('SELECT * FROM stats WHERE id =1$', [id], function (err, dbResponse) {
     if (err) {
       console.log(err);
       res.json({ status: 'fail', message:err})
@@ -93,7 +117,7 @@ console.log(req.query);
     }
     })
   })
-  app.post('/api/stats/:eatdelete', function (req, res) {
+  app.post('/api/stats/:insert', function (req, res) {
     const id = req.params.id;
     client.query('INSERT INTO stats ( eat, complete, due_date) VALUES (tacobell,false,12/18/17)', [id], function (err, dbResponse) {
     if (err) {
@@ -104,17 +128,17 @@ console.log(req.query);
     }
     })
   })
-  app.post('/api/stats/:eatdelete', function (req, res) {
-    const id = req.params.id;
-    client.query("INSERT INTO stats ( eat, complete, due_date) VALUES (pizza,true,12/13/17)", [id], function (err, dbResponse) {
-    if (err) {
-      console.log(err);
-      res.json({ status: 'fail', message:err})
-    }else{
-      res.json({status: 'success', stats: dbResponse.rows})
-    }
-    })
-  })
+  // app.post('/api/stats/:eatdelete', function (req, res) {
+  //   const id = req.params.id;
+  //   client.query("INSERT INTO stats ( eat, complete, due_date) VALUES (pizza,true,12/13/17)", [id], function (err, dbResponse) {
+  //   if (err) {
+  //     console.log(err);
+  //     res.json({ status: 'fail', message:err})
+  //   }else{
+  //     res.json({status: 'success', stats: dbResponse.rows})
+  //   }
+  //   })
+  // })
 app.listen(3000, function () {
   console.log("stattracker started")
 });
